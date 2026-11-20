@@ -17,6 +17,7 @@
 
 ```mermaid
 graph TD
+    %% 定义分层样式 (保持不变)
     classDef perception fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
     classDef network fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
     classDef ai fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
@@ -24,43 +25,44 @@ graph TD
     classDef actuator fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
 
     subgraph 感知层 [🟢 边缘感知层 Edge Perception]
-        CAM[ESP32-CAM 视觉采集]:::perception
-        SENSORS[光敏/热敏 NTC 物理传感器]:::perception
+        CAM["ESP32-CAM 视觉采集"]:::perception
+        SENSORS["光敏/热敏 NTC 物理传感器"]:::perception
     end
 
     subgraph 网络层 [🔵 网络通信层 Network & Comm]
-        HTTP[HTTP MJPEG 视频流推流]:::network
-        TCP[TCP Socket 双向异步通信]:::network
+        HTTP["HTTP MJPEG 视频流推流"]:::network
+        TCP["TCP Socket 双向异步通信"]:::network
     end
 
     subgraph 推理层 [🟣 核心推理层 AI Inference]
-        GPU[PC端 RTX 4060 GPU 算力]:::ai
-        YOLO[YOLOv8 目标检测模型]:::ai
-        NMS[NMS 非极大值抑制 + 置信度过滤]:::ai
+        GPU["PC端 RTX 4060 GPU 算力"]:::ai
+        YOLO["YOLOv8 目标检测模型"]:::ai
+        NMS["NMS 非极大值抑制 + 置信度过滤"]:::ai
     end
 
     subgraph 决策层 [🔴 业务决策层 Logic & Decision]
-        DEBOUNCE[积分防抖算法 / 状态机]:::logic
-        FUSION[多模态融合判定\n(视觉+环境数据)]:::logic
+        DEBOUNCE["积分防抖算法 / 状态机"]:::logic
+        FUSION["多模态融合判定<br/>(视觉+环境数据)"]:::logic
     end
 
     subgraph 执行层 [🟡 终端执行层 Actuator]
-        ESP32[ESP32 主控节点]:::actuator
-        ALARM[蜂鸣器声光报警]:::actuator
-        OLED[OLED 状态显示]:::actuator
+        ESP32["ESP32 主控节点"]:::actuator
+        ALARM["蜂鸣器声光报警"]:::actuator
+        OLED["OLED 状态显示"]:::actuator
     end
 
-    CAM -->|实时无线画面| HTTP
-    HTTP -->|OpenCV 视频流拉取| GPU
+    %% 连线关系 (保持不变)
+    CAM -->|"实时无线画面"| HTTP
+    HTTP -->|"OpenCV 视频流拉取"| GPU
     GPU --> YOLO --> NMS
-    NMS -->|输出目标坐标与类别| DEBOUNCE
+    NMS -->|"输出目标坐标与类别"| DEBOUNCE
     
-    SENSORS -->|ADC 数据采集| TCP
-    TCP -->|环境温湿度/光照同步| FUSION
+    SENSORS -->|"ADC 数据采集"| TCP
+    TCP -->|"环境温湿度/光照同步"| FUSION
     
-    DEBOUNCE -->|防误报输出| FUSION
-    FUSION -->|生成控制指令| TCP
-    TCP -->|下发 ALERT_ON/OFF| ESP32
+    DEBOUNCE -->|"防误报输出"| FUSION
+    FUSION -->|"生成控制指令"| TCP
+    TCP -->|"下发 ALERT_ON/OFF"| ESP32
     ESP32 --> ALARM
     ESP32 --> OLED
    ```
